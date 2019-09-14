@@ -85,7 +85,7 @@ const returnToLastTruck = (row, col) => {
 };
 ```
 
-In this point the last truck will be removed and the cell will be considered as a not valid position, because we not it doesn't lead to a solution. The program will start recursively to find another place for removed truck from the second last truck position (new start for the program). If the program check the remained cells and still can't find a cell to replace last truck, it will return back one step more and this time the second last truck will be removed and now the position of the second last truck is a not valid position! **Every call we have only one notValidPosition.**
+In this point the last truck will be removed and the cell will be considered as a not valid position, because we not it doesn't lead to a solution. The program will start recursively to find another place for removed truck from the second last truck position (new start for the program). If the program check the remained cells and still can't find a cell to replace last truck, it will return back one step more and this time the second last truck will be removed and now the position of the second last truck is a not valid position! **For every recursive call we have only one notValidPosition.**
 
 ### End
 I think this is a good solution because it emulates the natural way of solving it. It is easy to understand and it works! 🤩
