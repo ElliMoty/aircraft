@@ -1,68 +1,56 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Aircraft Refuelling Puzzle
 
-## Available Scripts
+## Description
 
-In the project directory, you can run:
+- 9 aircraft are parked at an airport and need to be refuelled before they can take off.
+- Fuel trucks are used to refuel the aircraft.
 
-### `npm start`
+## Task
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Place fuel trucks in the grid.
+- Each aircraft should have one fuel truck next to it (horizontally or vertically).
+- Fuel trucks do not touch each other, not even diagonally.
+- The numbers outside the grid show the total number of the fuel trucks in the corresponding row or columns.
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+## Solution
 
-### `npm test`
+- 1. Determine which cells are the possible positions for the fuel trucks around the aircraft. The return value will be a boolean.
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+isPossiblePlaceForTruck = (row, col) => {...}
+```
 
-### `npm run build`
+- 2. Distinguish the cells are next to the possible places for the trucks as 'Touching Zone'. We can't place the trucks there as part of the puzzle role. The return value will be a boolean.
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+const isTouchingZone = (row, col) => {...}
+```
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+- 3. Consider the number of placed trucks per row and per column to compare with the max required number of trucks per row and column. The return value is a number.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+const maxNumberOfTrucksPerRow = [...];
+const maxNumberOfTrucksPerColumn = [...];
+```
 
-### `npm run eject`
+- 4. Start the puzzle from (0,0) point - for the first time I started the puzzle on the paper to find the solution and to understand the logic behind - In this point the program should check some conditions like: is there any aircraft in this cell, isn't this cell the possible position to place a truck, is this cell a touching zone, if we place a truck here will we overpass the max required number of trucks per row and per column. If the return value for all above conditions are FALSE, so a truck will be placed in this point and we will move forward. But if one of these conditions return TRUE, the program will leave this cell and continue to find another place from next cell. When the program check all the cells in a row and place some trucks after checking all conditions, it will continue from another row and from column 0.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- 5. Another issue that should be addressed is when the program can't place any trucks in a row or place less trucks in comparison to the max number of trucks per row. It happens because there are more than one possible position to put a truck around an aircraft. For this issue, the program will stop continue to go to next row and in opposite it will return back cell by cell to find the position of the last truck. 
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+const returnToLastTruck = (row, col) => {
+  for (let i = row; i >= 0; i--) {
+    for (let j = col; j >= 0; j--) {
+      if (puzzle[i][j] === truck) {
+        return {
+          row: i,
+          col: j
+        };
+      }
+    }
+  }
+};
+```
+In this point the last truck will be removed and the cell will be considered as a notValidPosition. The program will start recursively to find another place for removed truck from the second last truck position (new start for the program). If the program check the remained cells and still can't find a cell to replace last truck, it will return back one step more and this time the second last truck will be removed and now the position of the second last truck is a notValidPlace! **Every time we have only one notValidPosition.**
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+- 6. It works! 🤩
