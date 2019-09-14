@@ -14,28 +14,61 @@
 
 ## Solution
 
-- 1. Determine which cells are the possible positions for the fuel trucks around the aircraft. The return value will be a boolean.
+Start the puzzle from (0,0) point - for the first time I started the puzzle on the paper to find the solution and to understand the logic behind - In this point the program should check some conditions like:
+
+- is there any aircraft in this cell
 
 ```
-isPossiblePlaceForTruck = (row, col) => {...}
+if (puzzle[row][col] === aircraft) {
+    continue;
+}
 ```
 
-- 2. Distinguish the cells are next to the possible places for the trucks as 'Touching Zone'. We can't place the trucks there as part of the puzzle role. The return value will be a boolean.
+- isn't this cell the possible position to place a truck
+
+```
+if (!isPossiblePlaceForTruck(row, col)) {
+    continue;
+}
+```
+
+- is this cell a touching zone
+
+```
+if (isTouchingZone(row, col)) {
+    continue;
+}
+```
+
+- if we place a truck here will we overpass the max required number of trucks per row and per column.
+
+```
+if (numberOfTruckPerRow(row) >= maxTrucksPerRow) {
+    continue;
+}
+if (numberOfTruckPerColumn(col) >= maxTrucksPerColumn) {
+    continue;
+}
+```
+
+If the return value for all above conditions are FALSE, so a truck will be placed in this point and we will move forward. But if one of these conditions return TRUE, the program will leave this cell and continue to find another place from next cell. When the program check all the cells in a row and place some trucks after checking all conditions, it will continue from another row and from column 0.
+
+### Helper functions
+
+- To determine which cells are the possible positions for the fuel trucks around the aircraft. The return value will be a boolean.
+
+```
+const isPossiblePlaceForTruck = (row, col) => {...}
+```
+
+- to distinguish the cells are next to the possible places for the trucks as 'Touching Zone'. We can't place the trucks there as part of the puzzle role. The return value will be a boolean.
 
 ```
 const isTouchingZone = (row, col) => {...}
 ```
+### Recursive Call
 
-- 3. Consider the number of placed trucks per row and per column to compare with the max required number of trucks per row and column. The return value is a number.
-
-```
-const maxNumberOfTrucksPerRow = [...];
-const maxNumberOfTrucksPerColumn = [...];
-```
-
-- 4. Start the puzzle from (0,0) point - for the first time I started the puzzle on the paper to find the solution and to understand the logic behind - In this point the program should check some conditions like: is there any aircraft in this cell, isn't this cell the possible position to place a truck, is this cell a touching zone, if we place a truck here will we overpass the max required number of trucks per row and per column. If the return value for all above conditions are FALSE, so a truck will be placed in this point and we will move forward. But if one of these conditions return TRUE, the program will leave this cell and continue to find another place from next cell. When the program check all the cells in a row and place some trucks after checking all conditions, it will continue from another row and from column 0.
-
-- 5. Another issue that should be addressed is when the program can't place any trucks in a row or place less trucks in comparison to the max number of trucks per row. It happens because there are more than one possible position to put a truck around an aircraft. For this issue, the program will stop continue to go to next row and in opposite it will return back cell by cell to find the position of the last truck. 
+One issue that should be addressed is when the program can't place any trucks in a row or place less trucks in comparison to the max number of trucks per row. It happens because there are more than one possible position to put a truck around an aircraft. For this issue, the program will stop continue to go to next row and instead it will return back cell by cell to find the position of the last truck.
 
 ```
 const returnToLastTruck = (row, col) => {
@@ -51,6 +84,8 @@ const returnToLastTruck = (row, col) => {
   }
 };
 ```
-In this point the last truck will be removed and the cell will be considered as a notValidPosition. The program will start recursively to find another place for removed truck from the second last truck position (new start for the program). If the program check the remained cells and still can't find a cell to replace last truck, it will return back one step more and this time the second last truck will be removed and now the position of the second last truck is a notValidPlace! **Every time we have only one notValidPosition.**
 
-- 6. It works! 🤩
+In this point the last truck will be removed and the cell will be considered as a not valid position, because we not it doesn't lead to a solution. The program will start recursively to find another place for removed truck from the second last truck position (new start for the program). If the program check the remained cells and still can't find a cell to replace last truck, it will return back one step more and this time the second last truck will be removed and now the position of the second last truck is a not valid position! **Every call we have only one notValidPosition.**
+
+### End
+I think this is a good solution because it emulates the natural way of solving it. It is easy to understand and it works! 🤩
